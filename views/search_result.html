@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Blog</title>
+</head>
+<body>
+<h2>Search Results</h2> {{num}} of {{count}}
+<br>
+    {% for doc in docs %}
+    id: {{doc._id}}
+    <br>
+    {% endfor %}
+
+</body>
+</html>
+
+
