@@ -14,7 +14,12 @@
     "swig": "~1.4.2",
     "validator": "~4.3.0",
     "body-parser": "~1.14.1",
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
     "cookie-parser": "~1.4.0"
+=======
+    "cookie-parser": "~1.4.0",
+    "cheerio": "~0.19.0"
+>>>>>>> Initial commit
   },
   "author": "Daniel L. Robertson",
   "license": "MPL-2.0"

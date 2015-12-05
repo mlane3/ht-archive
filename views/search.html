@@ -1,3 +1,4 @@
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,3 +24,37 @@
 </html>
 
 
+=======
+{% extends 'layout.html' %}
+
+{% block title %}
+Archive Search Results
+{% endblock %}
+
+{% block content %}
+    <h2>Search Results</h2>
+    <br>
+    <br>
+    {% for doc in docs %}
+        <form action="/show" method="POST">
+            <input type="hidden" name="id" value="{{doc._id}}"/>
+            <a href="#" onclick="this.parentNode.submit()">{{doc._id}}</a>
+        </form>
+    {% endfor %}
+    <br>
+    <ul class="pager">
+        {% if first_doc %}
+            <li class="previous"><a href="/search/?{{qs}}&page={{prev}}"><b>&laquo;</b></a></li>
+        {% else %}
+            <li class="disabled previous"><a href="#" class="grey-out">&laquo;</a></li>
+        {% endif %}
+        <li class="pagenum"><a><b>{{first_doc}} of {{count}}</b></a></li>
+        {% if next %}
+            <li class="next"><a href="/search/?{{qs}}&page={{next}}"><b>&raquo;</b></a></li>
+        {% else %}
+            <li class="disabled next"><a href="#">&raquo;</a></li>
+        {% endif %}
+    </ul>
+
+{% endblock %}
+>>>>>>> Initial commit

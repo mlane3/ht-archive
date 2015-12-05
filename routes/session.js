@@ -80,9 +80,12 @@ function SeshHandler(db) {
         var sesh_id = req.cookies.sesh;
 
         res.render("welcome", {"usr": req.usr});
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
         //seshdao.getUsr(sesh_id, function(err, sesh) {
         //    return res.render("welcome", {"usr": sesh["usr"]});
         //});
+=======
+>>>>>>> Initial commit
     }
 
     function validSignup(usr, pass, verify, email, errs) {

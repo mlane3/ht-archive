@@ -7,6 +7,7 @@ var express        = require("express")
   , cons         = require("consolidate")
   , routes       = require("./routes")
   , cookieParser = require("cookie-parser")
+  , path         = require("path")
   , app          = express();
 
 MongoClient.connect("mongodb://localhost:27017/crawler", function(err, db) {
@@ -16,6 +17,8 @@ MongoClient.connect("mongodb://localhost:27017/crawler", function(err, db) {
     app.engine("html", cons.swig);
 
     app.set("view engine", "html");
+
+    app.use(express.static(path.join(__dirname, 'public')));
 
     app.set("views", __dirname + "/views");
 

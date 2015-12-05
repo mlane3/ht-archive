@@ -30,6 +30,14 @@ module.exports = exports = function(app, db) {
 
     app.get("/", searchHandler.displaySearch);
 
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
     app.get("/search", urlencodedParser, searchHandler.handleQuery);
     app.post("/search", urlencodedParser, searchHandler.handleSearch);
+=======
+    app.get("/search", urlencodedParser, searchHandler.displayQuery);
+    app.post("/search", urlencodedParser, searchHandler.handleQuery);
+
+    app.get("/show", urlencodedParser, searchHandler.parseShow, searchHandler.displayShow);
+    app.post("/show", urlencodedParser, searchHandler.handleShow, searchHandler.displayShow);
+>>>>>>> Initial commit
 }

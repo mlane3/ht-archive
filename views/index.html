@@ -1,3 +1,4 @@
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
 <!doctype HTML>
 <html>
 <head>
@@ -30,13 +31,63 @@ Welcome {{usr}}        <a href="/logout">Logout</a><p>
     <input type="submit" value="Search">
 </form>
 <br>
+=======
+{% extends 'layout.html' %}
+{% block title %}Archive Search{% endblock %}
+
+{% block content %}
+{% if usr %}
+Welcome {{usr}}
+<div class="container">
+<div class="row">
+    <h2>Search</h2>
+</div>
+<form action="/search" method="POST">
+{{errs}}
+    <div class="row">
+        <b>Text</b>
+        <input type="search" name="search_text" size="90%" value="{{text}}">
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-4 col-md-3">
+            <b>Area</b>
+            <select name="search_area">
+                <option value="" selected="selected">None</option>
+                {% for area in areas %}
+                    <option value={{ area.key }}>{{ area.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <b>Phone</b>
+            <input type="tel" name="phone" value="{{phone}}" size="13">
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <b>Email</b>
+            <input type="email" name="email" value="{{email}}" size="13">
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <input type="submit" value="Search">
+    </div>
+</form>
+<br>
+</div>
+>>>>>>> Initial commit
 
 {% else %}
 You are not logged in!        <a href="/login">Login</a> | <a href="/signup">Sign Up</a><p>
 {% endif %}
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
 <br>
 <a href="/">Blog Home</a><br><br>
 
 </body>
 </html>
 
+=======
+{% endblock %}
+>>>>>>> Initial commit

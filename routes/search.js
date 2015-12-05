@@ -2,7 +2,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
 var daos = require("./daos");
+=======
+var daos        = require("./daos")
+  , cheerio      = require("cheerio");
+>>>>>>> Initial commit
 
 function SearchHandler(db) {
     "use strict";
@@ -26,7 +31,11 @@ function SearchHandler(db) {
         });
     }
 
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
     this.handleSearch = function(req, res, next) {
+=======
+    this.handleQuery = function(req, res, next) {
+>>>>>>> Initial commit
         "use strict";
         var errs  = ""
         var text  = req.body.search_text;
@@ -89,7 +98,11 @@ function SearchHandler(db) {
         });
     }
 
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
     this.handleQuery = function(req, res, next) {
+=======
+    this.displayQuery = function(req, res, next) {
+>>>>>>> Initial commit
         "use strict";
         searchdao.getQuery(req.query["text"], req.query["phone"],
                 req.query["email"], req.query["area"], function(err, qs, cur) {
@@ -115,6 +128,54 @@ function SearchHandler(db) {
                     });
                 });
     }
+<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
 }
 
+=======
+
+    this.parseShow = function(req, res, next) {
+        if(req.query && req.query["id"]) {
+            searchdao.getDoc(req.query["id"], function(err, doc) {
+                if(err) return next(err);
+
+                if(!doc) {
+                    return res.render("Oops", {"error": "No document found"});
+                }
+                req.doc = doc;
+                next();
+            });
+        } else {
+            res.render("Oops", {"error": "Document could not be found"});
+        }
+    }
+
+    this.displayShow = function(req, res, next) {
+        "use strict";
+        if(req.doc && req.doc["source"]) {
+            req.doc["source"] = cheerio.load(req.doc.source)("div.mainBody").html();
+            req.doc["source"] = req.doc["source"].replace("\n\r", "");
+            return res.render("show", {"doc": req.doc});
+        } else {
+            return res.render("Oops", {"error": "Document could not be found"});
+        }
+    }
+
+    this.handleShow = function(req, res, next) {
+        "use strict";
+
+        var id = req.body.id;
+        searchdao.getDoc(id, function(err, doc) {
+            if(err) return next(err);
+
+            if(!doc) {
+                return res.render("Oops", {"error": "No document found"});
+            }
+            req.doc = doc;
+            next();
+        });
+    }
+}
+
+
+>>>>>>> Initial commit
 module.exports = SearchHandler;

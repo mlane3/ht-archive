@@ -1,0 +1,53 @@
+.error { color: red }
+button.btn {
+    background: rgba(19, 13, 7, 0.74);
+    color: rgba(236, 214, 125, 0.84);
+}
+
+button:hover.btn {
+    background: rgba(19, 13, 7, 0.84);
+    color: rgba(236, 214, 125, 0.94);
+}
+
+.pager > li > a {
+    background: rgba(19, 13, 7, 0.74);
+    color: rgba(236, 214, 125, 0.84);
+    border-radius: 10px;
+}
+
+.pager > li.disabled > a {
+    background: rgba(19, 13, 7, 0.54);
+    color: rgba(236, 214, 125, 0.64);
+    border-radius: 10px;
+}
+
+.pager > li.disabled > a:focus,
+.pager > li.disabled > a:hover {
+    background: rgba(19, 13, 7, 0.54);
+    color: rgba(236, 214, 125, 0.64);
+    border-radius: 10px;
+}
+
+.pager > li.pagenum > a {
+    padding: 5px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.00);
+    color: rgba(19, 13, 7, 0.84);
+    border: 0px;
+}
+
+.pager > li.pagenum > a:hover,
+.pager > li.pagenum > a:focus {
+    padding: 5px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.00);
+    color: rgba(19, 13, 7, 0.84);
+}
+
+
+.pager > li > a:focus,
+.pager > li > a:hover {
+    background: rgba(19, 13, 7, 0.84);
+    color: rgba(236, 214, 125, 0.94);
+    border-radius: 10px;
+}
