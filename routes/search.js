@@ -29,6 +29,7 @@ function SearchHandler(db) {
 
     this.handleQuery = function(req, res, next) {
         "use strict";
+        var usr = req.usr;
         var errs  = ""
         var text  = req.body.search_text;
         var area  = req.body.search_area;
@@ -47,13 +48,16 @@ function SearchHandler(db) {
 
             cur.count(function(err, count) {
                 cur.limit(20).toArray(function(err, docs) {
+                    var doc =  {"docs": docs, "page": 1, "first_doc": 0,
+                        "count": count, "qs": qs, "usr": usr, "text": text,
+                        "area": area, "phone": phone, "email": email};
                     if(count > 20) {
-                        res.render("search", {"docs": docs, "page": 1, "first_doc": 0,
-                            "next": 2, "count": count, "qs": qs});
-                    } else {
-                        res.render("search", {"docs": docs, "page": 1, "first_doc": 0,
-                            "count": count, "qs": qs});
+                        doc["next"] = 2;
                     }
+                    searchdao.getAreas(function(err, areas) {
+                        doc["areas"] = areas;
+                        res.render("search", doc);
+                    });
                 });
             });
         });
@@ -92,29 +96,42 @@ function SearchHandler(db) {
 
     this.displayQuery = function(req, res, next) {
         "use strict";
-        searchdao.getQuery(req.query["text"], req.query["phone"],
-                req.query["email"], req.query["area"], function(err, qs, cur) {
-                    var num_re = /^[0-9]+$/;
-                    var pagenum = req.query["page"] - 1;
-                    var first_doc = 0;
-                    if(pagenum > 0) {
-                        if(num_re.test(pagenum)) {
-                            pagenum = parseInt(pagenum);
-                            first_doc = pagenum * 20;
-                        } else {
-                            return next(Error("page number must be an integer"));
-                        }
-                    } else {
-                        pagenum = 0;
-                    }
-                    var doc = { "page": pagenum + 1, "qs": qs, "first_doc": first_doc };
-                    cur.count(function(err,count) {
-                        doc["count"] = count;
-                        processCursor(cur, doc, function(doc) {
-                            res.render("search", doc);
-                        });
+        var text = req.query["text"];
+        var phone = req.query["phone"];
+        var email = req.query["email"];
+        var area = req.query["area"]
+        searchdao.getQuery(text, phone, email, area, function(err, qs, cur) {
+            var usr = req.usr;
+            var num_re = /^[0-9]+$/;
+            var pagenum = req.query["page"] - 1;
+            var first_doc = 0;
+            if(pagenum > 0) {
+                if(num_re.test(pagenum)) {
+                    pagenum = parseInt(pagenum);
+                    first_doc = pagenum * 20;
+                } else {
+                    return next(Error("page number must be an integer"));
+                }
+            } else {
+                pagenum = 0;
+            }
+            var doc = { "page": pagenum + 1, "qs": qs, "first_doc": first_doc,
+                "usr": usr};
+            cur.count(function(err,count) {
+                doc["count"] = count;
+                processCursor(cur, doc, function(doc) {
+                    doc["text"] = text;
+                    doc["email"] = email;
+                    doc["phone"] = phone;
+                    doc["area"] = area;
+                    doc["usr"] = req.usr;
+                    searchdao.getAreas(function(err, areas) {
+                        doc["areas"] = areas;
+                        return res.render("search", doc);
                     });
                 });
+            });
+        });
     }
 
     this.parseShow = function(req, res, next) {
