@@ -4,7 +4,6 @@
 
 var daos        = require("./daos")
   , cheerio      = require("cheerio");
->>>>>>> Initial commit
 
 function SearchHandler(db) {
     "use strict";
@@ -161,6 +160,4 @@ function SearchHandler(db) {
     }
 }
 
-
->>>>>>> Initial commit
 module.exports = SearchHandler;

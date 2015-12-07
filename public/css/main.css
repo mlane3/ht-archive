@@ -4,7 +4,10 @@ button.btn {
     color: rgba(236, 214, 125, 0.84);
 }
 
-button:hover.btn {
+button:hover.btn,
+button:active.btn,
+button:focus.btn,
+button:target.btn {
     background: rgba(19, 13, 7, 0.84);
     color: rgba(236, 214, 125, 0.94);
 }
