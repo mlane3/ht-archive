@@ -1,30 +1,3 @@
-<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
-<!DOCTYPE html>
-<html>
-<head>
-<title>My Blog</title>
-</head>
-<body>
-<h2>Search Results</h2> Document: {{first_doc}} of {{count}}
-<br>
-<br>
-    {% for doc in docs %}
-    id: {{doc._id}}
-    <br>
-    {% endfor %}
-    <br>
-    {% if first_doc %}
-    <a href="/search/?{{qs}}&page={{prev}}">Prev</a>
-    {% endif %}
-    {% if next %}
-    <a href="/search/?{{qs}}&page={{next}}">Next</a>
-    {% endif %}
-
-</body>
-</html>
-
-
-=======
 {% extends 'layout.html' %}
 
 {% block title %}
@@ -57,4 +30,3 @@ Archive Search Results
     </ul>
 
 {% endblock %}
->>>>>>> Initial commit

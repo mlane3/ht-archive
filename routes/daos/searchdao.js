@@ -15,10 +15,7 @@ function SearchDAO(db) {
     }
 
     this.getQuery = function(text, phone, email, area, cb) {
-<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
-=======
         "use strict";
->>>>>>> Initial commit
         var search_doc = {};
         var qs = "";
         var phone_re = /(\d{3})\D*(\d{3})\D*(\d{4})/;
@@ -53,16 +50,6 @@ function SearchDAO(db) {
 
         cb(null, qs, search.find(search_doc));
     }
-<<<<<<< 17daf3d758b05376a6b6611d5e492924e054f6cd
-=======
-
-    this.getDoc = function(id, cb) {
-        "use strict";
-        search.findOne({"_id": id}, function(err, doc) {
-            cb(err, doc);
-        });
-    }
->>>>>>> Initial commit
 }
 
 module.exports.SearchDAO = SearchDAO
