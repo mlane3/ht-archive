@@ -5,12 +5,14 @@ Archive Search Results
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <h2>Search</h2>
+        <div class="col-sm-9 col-md-10 main pull-left">
+            <h2>Search</h2>
+        </div>
     </div>
     <div class="row">
-        <div class="col-sm-8 col-md-8">
+        <div class="col-sm-9 col-md-10 main pull-left">
             <form role="form" class="form-horizontal" action="/search" method="POST">
                 <div class="form-group">
                     {{errs}}
@@ -43,7 +45,7 @@ Archive Search Results
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-8 col-md-8">
+        <div class="col-sm-9 col-sm-offset-1 col-md-10 col-md-offset-1 main pull-left">
             {% for document in docs %}
                 <form action="/show" method="POST">
                     <input type="hidden" name="id" value="{{document._id}}"/>

@@ -13,6 +13,9 @@ var express      = require("express")
 
 user_input = {
     "usr": "",
+    "host": "localhost",
+    "port": "27017",
+    "db": "crawler"
 };
 
 var i = 2;
@@ -28,9 +31,10 @@ while(i < new_len) {
     i += 2;
 }
 
+var url = "mongodb://" + user_input["host"] + ":" + user_input["port"] + "/" + user_input["db"];
 
 read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
-    MongoClient.connect("mongodb://localhost:27017/crawler", function(err, db) {
+    MongoClient.connect(url, function(err, db) {
         db.authenticate(user_input["usr"], pwd, function(err, result) {
             "use strict";
 
