@@ -137,15 +137,7 @@ function SeshHandler(db) {
                     return next(err);
                 }
 
-                seshdao.startSesh(usr, function(err, sesh_id) {
-                    "use strict";
-
-                    if(err) return next(err);
-
-                    res.cookie("sesh", sesh_id);
-
-                    return res.redirect("/welcome");
-                });
+                res.redirect("/login");
             });
         } else {
             return res.render("signup", errs);

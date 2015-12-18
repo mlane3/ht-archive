@@ -50,6 +50,12 @@ function SearchDAO(db) {
 
         cb(null, qs, search.find(search_doc));
     }
+
+    this.getDoc = function(id, cb) {
+        search.findOne({"_id": id}, function(err, doc) {
+            cb(err, doc);
+        });
+    }
 }
 
 module.exports.SearchDAO = SearchDAO
