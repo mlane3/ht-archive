@@ -4,10 +4,8 @@
 
 var bcrypt = require("bcrypt-nodejs");
 
-function UsrDAO(db) {
+function UsrDAO(client) {
     "use strict";
-
-    var users = db.collection("users");
 
     this.addUsr = function(usr, pass, email, cb) {
         "use strict";
@@ -15,12 +13,14 @@ function UsrDAO(db) {
         var salt = bcrypt.genSaltSync();
         var pass_hash = bcrypt.hashSync(pass, salt);
 
-        users.insert({"_id": usr, "pass": pass_hash, "email": email, "confirmed": false}, function(err, res) {
+        client.query(
+        "INSERT INTO siteusers(name,pass,email,datejoined,roleid) VALUES($1,$2,$3,NOW(),$4)",
+        usr,pass_hash,email,1,function(err, result) {
             "use strict";
 
             if(err) return cb(err, null);
 
-            return cb(null, res[0]);
+            return cb(null, result);
         });
     }
 

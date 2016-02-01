@@ -4,7 +4,7 @@
 
 var express      = require("express")
   , read         = require("read")
-  , MongoClient  = require("mongodb").MongoClient
+  , pg           = require("pg")
   , cons         = require("consolidate")
   , routes       = require("./routes")
   , cookieParser = require("cookie-parser")
@@ -13,9 +13,9 @@ var express      = require("express")
 
 user_input = {
     "usr": "",
-    "host": "localhost",
-    "port": "27017",
-    "db": "crawler"
+    "host": "danrobertson.org",
+    "port": "5432",
+    "db": "crawler2"
 };
 
 var i = 2;
@@ -31,32 +31,35 @@ while(i < new_len) {
     i += 2;
 }
 
-var url = "mongodb://" + user_input["host"] + ":" + user_input["port"] + "/" + user_input["db"];
 
 read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
-    MongoClient.connect(url, function(err, db) {
-        db.authenticate(user_input["usr"], pwd, function(err, result) {
-            "use strict";
+    var usr = user_input["usr"];
+    var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=true";
+    console.log(url)
+    console.log(usr)
+    pg.connect(url, function(err, client, done) {
+        "use strict";
 
-            if(!result) throw Error("Failed to log in with user - " + user_input["usr"])
+        //if(!result) throw Error("Failed to log in with user - " + usr)
 
-            if(err) throw err;
+        if(err) {
+            return console.error('error fetching client from pool', err);
+        }
 
-            app.engine("html", cons.swig);
-    
-            app.set("view engine", "html");
-    
-            app.use(express.static(path.join(__dirname, 'public')));
-    
-            app.set("views", __dirname + "/views");
-    
-            app.use(cookieParser());
-    
-            routes(app, db);
-    
-            app.listen(3000);
-    
-            console.log("Express server listening on port 3000");
-        });
+        app.engine("html", cons.swig);
+
+        app.set("view engine", "html");
+
+        app.use(express.static(path.join(__dirname, 'public')));
+
+        app.set("views", __dirname + "/views");
+
+        app.use(cookieParser());
+
+        //routes(app, db);
+
+        app.listen(3000);
+
+        console.log("Express server listening on port 3000");
     });
 });

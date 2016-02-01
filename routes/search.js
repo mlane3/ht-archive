@@ -2,8 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-var daos        = require("./daos")
-  , cheerio      = require("cheerio");
+var daos        = require("./daos");
 
 function SearchHandler(db) {
     "use strict";
@@ -153,8 +152,6 @@ function SearchHandler(db) {
     this.displayShow = function(req, res, next) {
         "use strict";
         if(req.doc && req.doc["source"]) {
-            req.doc["source"] = cheerio.load(req.doc.source)("div.mainBody").html();
-            req.doc["source"] = req.doc["source"].replace("\n\r", "");
             return res.render("show", {"doc": req.doc});
         } else {
             return res.render("Oops", {"error": "Document could not be found"});
