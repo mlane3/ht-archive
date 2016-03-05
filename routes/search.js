@@ -33,12 +33,22 @@ function SearchHandler(client) {
         if(!req.usr) return res.redirect("/login");
 
         var usr = req.usr;
-        var errs  = ""
+        var errs  = "";
+        console.log(req.body);
         var text  = req.body.search_text;
         var area  = req.body.search_area;
         var phone = req.body.phone;
         var email = req.body.email;
         var page = 0;
+        var date_re = /^\d{2}-\d{2}-\d{4}$/;
+        var startdate = null;
+        var enddate = null;
+        if(date_re.test(req.body.startdate)) {
+            startdate = req.body.startdate;
+        }
+        if(date_re.test(req.body.enddate)) {
+            startdate = req.body.enddate;
+        }
 
         searchdao.getBackpageQuery(text, phone, email, area, page, function(err, qs, cur) {
             if(err) {

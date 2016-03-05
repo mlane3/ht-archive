@@ -15,7 +15,8 @@ user_input = {
     "usr": "",
     "host": "anidata.org",
     "port": "5432",
-    "db": "crawler2"
+    "db": "crawler2",
+    "pwd": ""
 };
 
 var i = 2;
@@ -31,9 +32,7 @@ while(i < new_len) {
     i += 2;
 }
 
-
-var pwd = "n@t3Lk7aSf"
-//read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
+runServer = function(err, pwd) {
     var usr = user_input["usr"];
     var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=true";
     pg.connect(url, function(err, client, done) {
@@ -61,4 +60,12 @@ var pwd = "n@t3Lk7aSf"
 
         console.log("Express server listening on port 3000");
     });
-//});
+}
+
+if(!user_input["pwd"]) {
+    read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
+        runServer(err, pwd);
+    });
+} else {
+    runServer(null, user_input["pwd"]);
+}

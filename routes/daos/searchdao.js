@@ -7,7 +7,7 @@ function SearchDAO(client) {
     this.getAreas = function(cb) {
         "use strict";
 
-        var q = "SELECT * FROM backpagesite";
+        var q = "SELECT DISTINCT ON (name) name,id FROM backpagesite ORDER BY name";
         client.query(q, [], function(err, result) {
             if(err) cb(err, null);
 
@@ -66,7 +66,7 @@ function SearchDAO(client) {
         } else {
             q = " TRUE"
         }
-        q += " ORDER BY page.id DESC LIMIT 20 OFFSET " + (page * 20) + ";";
+        q += " ORDER BY backpagepost.postdate DESC LIMIT 20 OFFSET " + (page * 20) + ";";
         console.log(tables + " WHERE " + q);
 
         client.query(tables + " WHERE " + q, [], function(err, result) {
