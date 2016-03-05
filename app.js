@@ -56,9 +56,9 @@ runServer = function(err, pwd) {
         var searchDAO = new daos.SearchDAO(client);
         routes(app, client);
 
-        app.listen(3000);
+        app.listen(8080);
 
-        console.log("Express server listening on port 3000");
+        console.log("Express server listening on port 8000");
     });
 }
 

@@ -137,7 +137,7 @@ function SearchHandler(client) {
             var total = cur[0]["total"];
             var doc = { "page": pagenum, "qs": qs, "first_doc": first_doc,
                 "usr": usr, "text": text, "email": email, "phone": phone,
-                "area": area, "usr": req.usr, "docs": cur, "count": total,
+                "area": area, "docs": cur, "count": total,
                 "prev": pagenum - 1
             };
             if(total >= 20) {
