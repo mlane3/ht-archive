@@ -13,7 +13,7 @@ var express      = require("express")
 
 user_input = {
     "usr": "",
-    "host": "danrobertson.org",
+    "host": "anidata.org",
     "port": "5432",
     "db": "crawler2"
 };
@@ -32,7 +32,8 @@ while(i < new_len) {
 }
 
 
-read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
+var pwd = "n@t3Lk7aSf"
+//read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
     var usr = user_input["usr"];
     var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=true";
     pg.connect(url, function(err, client, done) {
@@ -60,4 +61,4 @@ read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
 
         console.log("Express server listening on port 3000");
     });
-});
+//});

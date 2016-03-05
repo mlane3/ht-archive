@@ -34,5 +34,5 @@ module.exports = exports = function(app, client) {
     app.get("/show", urlencodedParser, searchHandler.parseShow, searchHandler.displayShow);
     app.post("/show", urlencodedParser, searchHandler.handleShow, searchHandler.displayShow);
 
-    app.get("/", urlencodedParser, searchHandler.displayQuery);
+    app.get("/", urlencodedParser, searchHandler.displaySearch);
 }

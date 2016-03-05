@@ -22,16 +22,16 @@ function SearchDAO(client) {
         var tables = "SELECT page.id,backpagecontent.title,backpagepost.*,backpagesite.name,COUNT(*) OVER() AS total FROM page LEFT JOIN backpagepost ON page.id = backpagepost.pageid LEFT JOIN backpagecontent ON backpagepost.id = backpagecontent.backpagepostid LEFT JOIN backpagesite ON backpagesite.id = backpagepost.backpagesiteid"
         var q = "";
         var phone_re = /(\d{3})\W*(\d{3})\W*(\d{4})/;
+        console.log("getBackpageQuery page: " + page);
         if(text) {
             if(qs != "") {
                 qs += "&";
                 q += " AND "
             }
             text = text.replace(/;/g, "");
-            text = text.replace(/\s+/g, " | ");
-            console.log(text);
-            text = text.replace(/\| and \|/g, "&");
-            console.log(text);
+            // TODO: Sanitize input
+            //text = text.replace(/\s+/g, " | ");
+            //text = text.replace(/\| and \|/g, "&");
             q += "backpagecontent.textsearch @@ to_tsquery('" + text + "')"
             qs += "text=" + text;
         }
@@ -40,7 +40,7 @@ function SearchDAO(client) {
                 qs += "&";
                 q += " AND "
             }
-            q += "backpagephone.number = " + phone.replace(phone_re, "'$1-$2-$3'");
+            q += "backpagephone.number = " + phone.replace(phone_re, "'$1$2$3'");
             tables += " LEFT JOIN backpagephone ON backpagepost.id = backpagephone.backpagepostid"
             qs += "phone=" + phone;
         }
@@ -50,7 +50,7 @@ function SearchDAO(client) {
                 q += " AND ";
             }
             tables += " LEFT JOIN backpageemail ON backpagepost.id = backpageemail.backpagepostid"
-            q += "backpagephone.email = '" + email + "'";
+            q += "backpageemail.name = '" + email + "'";
             qs += "email=" + email;
         }
         if(area) {
@@ -66,11 +66,12 @@ function SearchDAO(client) {
         } else {
             q = " TRUE"
         }
-        qs += "page=" + page;
-        q += " ORDER BY page.id DESC LIMIT 20 OFFSET " + (page * 20) + ";"
+        q += " ORDER BY page.id DESC LIMIT 20 OFFSET " + (page * 20) + ";";
+        console.log(tables + " WHERE " + q);
 
         client.query(tables + " WHERE " + q, [], function(err, result) {
             if(err) cb(err, null, null);
+            if(!result) cb(err, null, null);
 
             cb(null, qs, result["rows"]);
         });

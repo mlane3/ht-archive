@@ -2,7 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-var daos        = require("./daos");
+var daos    = require("./daos"),
+    cheerio = require("cheerio");
 
 function SearchHandler(client) {
     "use strict";
@@ -28,6 +29,9 @@ function SearchHandler(client) {
 
     this.handleQuery = function(req, res, next) {
         "use strict";
+
+        if(!req.usr) return res.redirect("/login");
+
         var usr = req.usr;
         var errs  = ""
         var text  = req.body.search_text;
@@ -49,10 +53,10 @@ function SearchHandler(client) {
             searchdao.getAreas(function(err, areas) {
                 var doc =  {"docs": cur, "page": page, "first_doc": 0,
                     "count": cur[0]["total"], "qs": qs, "usr": usr,
-                    "text": text, "area": area, "phone": phone,
+                    "text": text, "area": area, "phone": phone, "prev": 0,
                     "email": email, "areas": areas };
-                if(cur.length > 20) {
-                    doc["next"] = 2;
+                if(cur.length >= 20) {
+                    doc["next"] = 1;
                 }
                 res.render("search", doc);
             });
@@ -92,14 +96,19 @@ function SearchHandler(client) {
 
     this.displayQuery = function(req, res, next) {
         "use strict";
+
+        if(!req.usr) return res.redirect("/login");
+
         var text = req.query["text"];
         var phone = req.query["phone"];
         var email = req.query["email"];
         var area = req.query["area"]
-        var pagenum = req.query["page"] - 1;
+        var pagenum = req.query["page"];
+        console.log(req.query);
         var first_doc = 0;
         var num_re = /^[0-9]+$/;
-        if(pagenum > 0) {
+        console.log("displayQuery page: " + pagenum);
+        if(pagenum >= 0) {
             if(num_re.test(pagenum)) {
                 pagenum = parseInt(pagenum);
                 first_doc = pagenum * 20;
@@ -109,28 +118,21 @@ function SearchHandler(client) {
         } else {
             pagenum = 0;
         }
+        console.log("displayQuery: " + pagenum);
         searchdao.getBackpageQuery(text, phone, email, area, pagenum, function(err, qs, cur) {
             if (err) next(err);
 
             var usr = req.usr;
-            var num_re = /^[0-9]+$/;
-            var pagenum = req.query["page"] - 1;
-            var first_doc = 0;
-            if(pagenum > 0) {
-                if(num_re.test(pagenum)) {
-                    pagenum = parseInt(pagenum);
-                    first_doc = pagenum * 20;
-                } else {
-                    return next(Error("page number must be an integer"));
-                }
-            } else {
-                pagenum = 0;
-            }
-            var doc = { "page": pagenum + 1, "qs": qs, "first_doc": first_doc,
+            var page = pagenum + 1;
+            var total = cur[0]["total"];
+            var doc = { "page": pagenum, "qs": qs, "first_doc": first_doc,
                 "usr": usr, "text": text, "email": email, "phone": phone,
-                "area": area, "usr": req.usr, "docs": cur,
-                "count": cur[0]["total"]
+                "area": area, "usr": req.usr, "docs": cur, "count": total,
+                "prev": pagenum - 1
             };
+            if(total >= 20) {
+                doc["next"] = page;
+            }
             searchdao.getAreas(function(err, areas) {
                 doc["areas"] = areas
                 return res.render("search", doc);
@@ -139,8 +141,10 @@ function SearchHandler(client) {
     }
 
     this.parseShow = function(req, res, next) {
+        "use strict";
+        if(!req.usr) return res.redirect("/login");
         if(req.query && req.query["id"]) {
-            searchdao.getDoc(req.query["id"], function(err, doc) {
+            searchdao.getBackpagePost(req.query["id"], function(err, doc) {
                 if(err) return next(err);
 
                 if(!doc) {
@@ -156,8 +160,10 @@ function SearchHandler(client) {
 
     this.displayShow = function(req, res, next) {
         "use strict";
-        if(req.doc && req.doc["source"]) {
-            return res.render("show", {"doc": req.doc});
+        if(!req.usr) return res.redirect("/login");
+        if(req.doc && req.doc["content"]) {
+            req.doc["content"] = cheerio.load(req.doc["content"])("div.mainBody").html();
+            return res.render("show", req.doc);
         } else {
             return res.render("Oops", {"error": "Document could not be found"});
         }
@@ -165,9 +171,10 @@ function SearchHandler(client) {
 
     this.handleShow = function(req, res, next) {
         "use strict";
+        if(!req.usr) return res.redirect("/login");
 
         var id = req.body.id;
-        searchdao.getDoc(id, function(err, doc) {
+        searchdao.getBackpagePost(id, function(err, doc) {
             if(err) return next(err);
 
             if(!doc) {
