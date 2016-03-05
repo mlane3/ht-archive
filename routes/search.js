@@ -4,10 +4,10 @@
 
 var daos        = require("./daos");
 
-function SearchHandler(db) {
+function SearchHandler(client) {
     "use strict";
 
-    var searchdao = new daos.SearchDAO(db);
+    var searchdao = new daos.SearchDAO(client);
 
     this.displaySearch = function(req, res, next) {
         "use strict";
@@ -34,30 +34,27 @@ function SearchHandler(db) {
         var area  = req.body.search_area;
         var phone = req.body.phone;
         var email = req.body.email;
+        var page = 0;
 
-        searchdao.getQuery(text, phone, email, area, function(err, qs, cur) {
+        searchdao.getBackpageQuery(text, phone, email, area, page, function(err, qs, cur) {
             if(err) {
                 req.errs = "Error: database error";
                 return res.render("index");
             }
-            if(!res) {
+            if(!cur.length) {
                 req.errs = "Error: no search results";
                 return res.render("index");
             }
 
-            cur.count(function(err, count) {
-                cur.limit(20).toArray(function(err, docs) {
-                    var doc =  {"docs": docs, "page": 1, "first_doc": 0,
-                        "count": count, "qs": qs, "usr": usr, "text": text,
-                        "area": area, "phone": phone, "email": email};
-                    if(count > 20) {
-                        doc["next"] = 2;
-                    }
-                    searchdao.getAreas(function(err, areas) {
-                        doc["areas"] = areas;
-                        res.render("search", doc);
-                    });
-                });
+            searchdao.getAreas(function(err, areas) {
+                var doc =  {"docs": cur, "page": page, "first_doc": 0,
+                    "count": cur[0]["total"], "qs": qs, "usr": usr,
+                    "text": text, "area": area, "phone": phone,
+                    "email": email, "areas": areas };
+                if(cur.length > 20) {
+                    doc["next"] = 2;
+                }
+                res.render("search", doc);
             });
         });
     }
@@ -99,7 +96,22 @@ function SearchHandler(db) {
         var phone = req.query["phone"];
         var email = req.query["email"];
         var area = req.query["area"]
-        searchdao.getQuery(text, phone, email, area, function(err, qs, cur) {
+        var pagenum = req.query["page"] - 1;
+        var first_doc = 0;
+        var num_re = /^[0-9]+$/;
+        if(pagenum > 0) {
+            if(num_re.test(pagenum)) {
+                pagenum = parseInt(pagenum);
+                first_doc = pagenum * 20;
+            } else {
+                return next(Error("page number must be an integer"));
+            }
+        } else {
+            pagenum = 0;
+        }
+        searchdao.getBackpageQuery(text, phone, email, area, pagenum, function(err, qs, cur) {
+            if (err) next(err);
+
             var usr = req.usr;
             var num_re = /^[0-9]+$/;
             var pagenum = req.query["page"] - 1;
@@ -115,20 +127,13 @@ function SearchHandler(db) {
                 pagenum = 0;
             }
             var doc = { "page": pagenum + 1, "qs": qs, "first_doc": first_doc,
-                "usr": usr};
-            cur.count(function(err,count) {
-                doc["count"] = count;
-                processCursor(cur, doc, function(doc) {
-                    doc["text"] = text;
-                    doc["email"] = email;
-                    doc["phone"] = phone;
-                    doc["area"] = area;
-                    doc["usr"] = req.usr;
-                    searchdao.getAreas(function(err, areas) {
-                        doc["areas"] = areas;
-                        return res.render("search", doc);
-                    });
-                });
+                "usr": usr, "text": text, "email": email, "phone": phone,
+                "area": area, "usr": req.usr, "docs": cur,
+                "count": cur[0]["total"]
+            };
+            searchdao.getAreas(function(err, areas) {
+                doc["areas"] = areas
+                return res.render("search", doc);
             });
         });
     }

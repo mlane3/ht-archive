@@ -35,12 +35,8 @@ while(i < new_len) {
 read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
     var usr = user_input["usr"];
     var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=true";
-    console.log(url)
-    console.log(usr)
     pg.connect(url, function(err, client, done) {
         "use strict";
-
-        //if(!result) throw Error("Failed to log in with user - " + usr)
 
         if(err) {
             return console.error('error fetching client from pool', err);
@@ -56,7 +52,9 @@ read({"prompt": "Password: ", "silent": true}, function(err, pwd) {
 
         app.use(cookieParser());
 
-        //routes(app, db);
+        var daos = require("./routes/daos");
+        var searchDAO = new daos.SearchDAO(client);
+        routes(app, client);
 
         app.listen(3000);
 

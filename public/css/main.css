@@ -54,3 +54,8 @@ button:target.btn {
     color: rgba(236, 214, 125, 0.94);
     border-radius: 10px;
 }
+
+table.search {
+    border-collapse: separate;
+    border-spacing: 50px 0;
+}

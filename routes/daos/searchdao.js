@@ -7,51 +7,80 @@ function SearchDAO(client) {
     this.getAreas = function(cb) {
         "use strict";
 
-        headers.findOne({"_id": "areas"}, function(err, areas) {
-            cb(null, areas["areas"]);
+        var q = "SELECT * FROM backpagesite";
+        client.query(q, [], function(err, result) {
+            if(err) cb(err, null);
+
+            var rows = result["rows"];
+            cb(null, rows);
         });
     }
 
-    this.getQuery = function(text, phone, email, area, cb) {
+    this.getBackpageQuery = function(text, phone, email, area, page, cb) {
         "use strict";
-        var search_doc = {};
         var qs = "";
-        var phone_re = /(\d{3})\D*(\d{3})\D*(\d{4})/;
+        var tables = "SELECT page.id,backpagecontent.title,backpagepost.*,backpagesite.name,COUNT(*) OVER() AS total FROM page LEFT JOIN backpagepost ON page.id = backpagepost.pageid LEFT JOIN backpagecontent ON backpagepost.id = backpagecontent.backpagepostid LEFT JOIN backpagesite ON backpagesite.id = backpagepost.backpagesiteid"
+        var q = "";
+        var phone_re = /(\d{3})\W*(\d{3})\W*(\d{4})/;
         if(text) {
-            search_doc["$text"] = {"$search": text};
             if(qs != "") {
                 qs += "&";
+                q += " AND "
             }
+            text = text.replace(/;/g, "");
+            text = text.replace(/\s+/g, " | ");
+            console.log(text);
+            text = text.replace(/\| and \|/g, "&");
+            console.log(text);
+            q += "backpagecontent.textsearch @@ to_tsquery('" + text + "')"
             qs += "text=" + text;
         }
         if(phone) {
-            search_doc["contact.phones"] = phone.replace(phone_re, "$1-$2-$3");
             if(qs != "") {
                 qs += "&";
+                q += " AND "
             }
+            q += "backpagephone.number = " + phone.replace(phone_re, "'$1-$2-$3'");
+            tables += " LEFT JOIN backpagephone ON backpagepost.id = backpagephone.backpagepostid"
             qs += "phone=" + phone;
         }
         if(email) {
-            search_doc["contact.emails"] = email;
             if(qs != "") {
                 qs += "&";
+                q += " AND ";
             }
+            tables += " LEFT JOIN backpageemail ON backpagepost.id = backpageemail.backpagepostid"
+            q += "backpagephone.email = '" + email + "'";
             qs += "email=" + email;
         }
         if(area) {
-            search_doc["siteInfo.area"] = area;
             if(qs != "") {
                 qs += "&";
+                q += " AND ";
             }
+            q += "backpagepost.backpagesiteid = " + area;
             qs += "area=" + area;
         }
+        if(qs != "") {
+            qs += "&";
+        } else {
+            q = " TRUE"
+        }
+        qs += "page=" + page;
+        q += " ORDER BY page.id DESC LIMIT 20 OFFSET " + (page * 20) + ";"
 
-        cb(null, qs, search.find(search_doc));
+        client.query(tables + " WHERE " + q, [], function(err, result) {
+            if(err) cb(err, null, null);
+
+            cb(null, qs, result["rows"]);
+        });
     }
 
-    this.getDoc = function(id, cb) {
-        search.findOne({"_id": id}, function(err, doc) {
-            cb(err, doc);
+    this.getBackpagePost = function(id, cb) {
+        var q = "SELECT * FROM page LEFT JOIN backpagepost ON page.id = backpagepost.pageid LEFT JOIN backpagecontent ON backpagepost.id = backpagecontent.backpagepostid WHERE page.id = $1"
+        client.query(q, [id], function(err, result) {
+            if(err) cb(err, null);
+            cb(null, result["rows"][0]);
         });
     }
 }

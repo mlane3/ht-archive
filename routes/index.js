@@ -8,13 +8,13 @@ var bodyParser    = require("body-parser")
   , SeshHandler   = require("./session")
   , SearchHandler = require("./search");
 
-module.exports = exports = function(app, db) {
+module.exports = exports = function(app, client) {
     var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
     var jsonParser = bodyParser.json();
 
-    var seshHandler   = new SeshHandler(db);
-    var searchHandler = new SearchHandler(db);
+    var seshHandler   = new SeshHandler(client);
+    var searchHandler = new SearchHandler(client);
 
     app.use(seshHandler.isLoggedInMiddleware);
 
@@ -28,11 +28,11 @@ module.exports = exports = function(app, db) {
     app.get("/signup", seshHandler.displaySignup);
     app.post("/signup", urlencodedParser, seshHandler.handleSignup);
 
-    app.get("/", searchHandler.displaySearch);
-
     app.get("/search", urlencodedParser, searchHandler.displayQuery);
     app.post("/search", urlencodedParser, searchHandler.handleQuery);
 
     app.get("/show", urlencodedParser, searchHandler.parseShow, searchHandler.displayShow);
     app.post("/show", urlencodedParser, searchHandler.handleShow, searchHandler.displayShow);
+
+    app.get("/", urlencodedParser, searchHandler.displayQuery);
 }

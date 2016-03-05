@@ -4,19 +4,19 @@
 
 var crypto = require("crypto");
 
-function SeshDAO(db) {
+function SeshDAO(client) {
     "use strict";
 
-    var sessions = db.collection("sessions");
-
-    this.startSesh = function(usr, cb) {
+    this.startSesh = function(usrdata, cb) {
         "use strict";
 
         var cur_date = (new Date()).valueOf().toString();
         var rand     = Math.random().toString();
         var sesh_id  = crypto.createHash("sha1").update(cur_date + rand).digest("hex");
 
-        sessions.insert({"_id": sesh_id, "usr": usr}, function(err, res) {
+        var q = "INSERT INTO sitesessions(id, userid, username) VALUES ($1,$2,$3);"
+        var vals = [sesh_id, usrdata["id"], usrdata["name"]];
+        client.query(q, vals, function(err, res) {
             "use strict";
             cb(err, sesh_id);
         });
@@ -24,7 +24,9 @@ function SeshDAO(db) {
 
     this.endSesh = function(sesh_id, cb) {
         "use strict";
-        sessions.remove({"_id": sesh_id}, function(err, res) {
+        var q = "DELETE FROM sitesessions WHERE id = $1;";
+        var vals = [sesh_id];
+        client.query(q, vals, function(err, res) {
             "use strict";
             cb(err, null);
         });
@@ -38,17 +40,19 @@ function SeshDAO(db) {
             return;
         }
 
-        sessions.findOne({"_id": sesh_id}, function(err, sesh) {
+        var q = "SELECT userid,username FROM sitesessions WHERE id = $1;";
+        var vals = [sesh_id];
+        client.query(q, vals, function(err, sesh) {
             "use strict";
 
             if(err) return cb(err, null);
 
-            if(!sesh) {
+            if(!sesh["rows"]) {
                 cb(new Error("Error: session# " + sesh_id + " not found"), null);
                 return;
             }
 
-            cb(null, sesh.usr);
+            cb(null, sesh["rows"][0]);
         });
     }
 }

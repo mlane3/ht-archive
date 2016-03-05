@@ -13,9 +13,9 @@ function UsrDAO(client) {
         var salt = bcrypt.genSaltSync();
         var pass_hash = bcrypt.hashSync(pass, salt);
 
-        client.query(
-        "INSERT INTO siteusers(name,pass,email,datejoined,roleid) VALUES($1,$2,$3,NOW(),$4)",
-        usr,pass_hash,email,1,function(err, result) {
+        var q = "INSERT INTO siteusers(name,pass,email,datejoined,roleid) VALUES($1,$2,$3,NOW(),$4);";
+        var vals = [usr,pass_hash,email,1];
+        client.query(q, vals, function(err, result) {
             "use strict";
 
             if(err) return cb(err, null);
@@ -27,13 +27,19 @@ function UsrDAO(client) {
     this.validLogin = function(usr, pass, cb) {
         "use strict";
 
-        users.findOne({"_id": usr}, function(err, res) {
+        var q = "SELECT id,name,pass,roleid FROM siteusers WHERE name = $1;";
+        client.query(q, [usr], function(err, result) {
             "use strict";
 
             if(err) return cb(err, null);
 
+            var res = result["rows"][0];
             if(res) {
-                if(res["confirmed"] && bcrypt.compareSync(pass, res["pass"])) {
+                if(res["roleid"] == 1) {
+                    var not_confirmed = new Error("User not confirmed");
+                    not_confirmed.bad_pass = true;
+                    return cb(not_confirmed, null);
+                } else if(bcrypt.compareSync(pass, res["pass"])) {
                     return cb(null, res);
                 } else {
                     var bad_pass_err = new Error("Invalid Password");
@@ -44,6 +50,22 @@ function UsrDAO(client) {
                 var bad_usr_err = new Error("Invalid Username");
                 bad_usr_err.bad_usr = true;
                 return cb(bad_usr_err, null);
+            }
+        });
+    }
+
+    this.getUserByName = function(usr, cb) {
+        "use strict";
+
+        var q = "SELECT * FROM siteusers WHERE name = $1";
+
+        client.query(q, [usr], function(err, result) {
+            if(err) return cb(err, null);
+
+            if(result["rows"].length != 1) {
+                return cb(Error("Unique userid not found"), null);
+            } else {
+                return cb(null, result["rows"][0]);
             }
         });
     }

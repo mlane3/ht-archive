@@ -23,10 +23,7 @@ Archive Search Results
                         <select name="search_area" class="form-control">
                             <option value="" selected="selected">Search Area</option>
                             {% for it in areas %}
-                                <option class="form-control" value={{ it.key }}>{{ it.name }}</option>
-                                {% if it.key == area %}
-                                    <option class="form-control" value={{ it.key }} selected="selected">{{ it.name }}</option>
-                                {% endif %}
+                                <option class="form-control" value={{ it.id }}>{{ it.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -48,8 +45,16 @@ Archive Search Results
         <div class="col-sm-9 col-sm-offset-1 col-md-10 col-md-offset-1 main pull-left">
             {% for document in docs %}
                 <form action="/show" method="POST">
-                    <input type="hidden" name="id" value="{{document._id}}"/>
-                    <a href="#" onclick="this.parentNode.submit()">{{document._id}}</a>
+                    <input type="hidden" name="id" value="{{document.id}}"/>
+                    <a href="#" onclick="this.parentNode.submit()">{{document.title}}</a>
+                    <br>
+                    <table class="search">
+                        <tr>
+                            <td><b>Posters Age:</b></td><td>{{document.posterage}}</td>
+                            <td><b>Backpage Site:</b></td><td>{{document.name}}</td>
+                        </tr>
+                    </table>
+                    <br>
                 </form>
             {% endfor %}
             <br>

@@ -4,18 +4,19 @@
 
 var daos = require("./daos")
 
-function SeshHandler(db) {
+function SeshHandler(client) {
     "use strict";
 
-    var usrdao  = new daos.UsrDAO(db)
-    var seshdao = new daos.SeshDAO(db)
+    var usrdao  = new daos.UsrDAO(client)
+    var seshdao = new daos.SeshDAO(client)
 
     this.isLoggedInMiddleware = function(req, res, next) {
         var sesh_id = req.cookies.sesh;
         seshdao.getUsr(sesh_id, function(err, usr) {
             "use strict";
             if(!err && usr) {
-                req.usr = usr;
+                req.usr = usr["username"];
+                req.usrid = usr["userid"];
             }
             return next();
         });
@@ -35,7 +36,6 @@ function SeshHandler(db) {
         usrdao.validLogin(usr, pass, function(err, doc) {
             "use strict";
 
-            console.log(err);
             if(err) {
                 if(err.bad_usr) {
                     return res.render("login",
@@ -48,13 +48,17 @@ function SeshHandler(db) {
                 }
             }
 
-            seshdao.startSesh(usr, function(err, sesh_id) {
-                "use strict";
-
+            usrdao.getUserByName(usr, function(err, userdata) {
                 if(err) return next(err);
 
-                res.cookie("sesh", sesh_id);
-                return res.redirect("/welcome");
+                seshdao.startSesh(userdata, function(err, sesh_id) {
+                    "use strict";
+
+                    if(err) return next(err);
+
+                    res.cookie("sesh", sesh_id);
+                    return res.redirect("/welcome");
+                });
             });
         });
     }
@@ -130,9 +134,19 @@ function SeshHandler(db) {
                 "use strict";
 
                 if(err) {
-                    if(err.code == "11000") {
-                        errs["usr_err"] = "invalid username. username already in use";
-                        return res.render("signup", errs);
+                    console.log(err.name);
+                    var keys = Object.keys(err);
+                    for(var i = 0; i < keys.length; ++i) {
+                        console.log(err[keys[i]]);
+                    }
+                    if(err["code"] == "23505") {
+                        if(errs["constraint"] == "siteusers_name_key") {
+                            errs["usr_err"] = "invalid username. user already in use";
+                            return res.render("signup", errs);
+                        } else if(errs["constraint"] == "siteusers_email_key") {
+                            errs["email_err"] = "invalid email. email already in use";
+                            return res.render("signup", errs);
+                        }
                     }
                     return next(err);
                 }
