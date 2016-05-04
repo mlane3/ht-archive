@@ -28,6 +28,7 @@ We break up our tags into the categories listed below.
 | | ~L-html | HTML will be used |
 | **Metadata** | | Metadata tags |
 | | ~M-duplicate | Duplicate |
+| | ~M-meta | Metabug (Tracking |
 | | ~M-unconfirmed | Bug that has not been validated |
 | **Priority** | | Priority tags |
 | | ~P-high | High priority |
