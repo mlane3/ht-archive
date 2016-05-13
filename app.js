@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) <year> <copyright holder>
  * All rights reserved.
  *
@@ -18,9 +18,9 @@ var express      = require("express")
 
 user_input = {
     "usr": "",
-    "host": "anidata.org",
-    "port": "5432",
-    "db": "crawler2",
+    "host": "",
+    "port": "",
+    "db": "",
     "pwd": ""
 };
 

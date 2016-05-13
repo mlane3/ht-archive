@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) <year> <copyright holder>
  * All rights reserved.
  *
@@ -25,10 +25,10 @@ module.exports = exports = function(app, client) {
 
     app.use(seshHandler.isLoggedInMiddleware);
 
-    app.get("/login", seshHandler.displayLogin);
-    app.post("/login", jsonParser, urlencodedParser, seshHandler.handleLogin);
-
-    app.get("/logout", seshHandler.displayLogout);
+    // app.get("/login", seshHandler.displayLogin);
+    // app.post("/login", jsonParser, urlencodedParser, seshHandler.handleLogin);
+    //
+    // app.get("/logout", seshHandler.displayLogout);
 
     app.get("/welcome", seshHandler.displayWelcome);
 
