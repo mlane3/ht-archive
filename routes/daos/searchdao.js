@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) <year> <copyright holder>
  * All rights reserved.
  *
@@ -45,7 +45,7 @@ function SearchDAO(client) {
                 qs += "&";
                 q += " AND "
             }
-            q += "backpagephone.number = " + phone.replace(phone_re, "'$1$2$3'");
+            q += "backpagephone.number = " + phone.replace(phone_re, "'$1-$2-$3'");
             tables += " LEFT JOIN backpagephone ON backpagepost.id = backpagephone.backpagepostid"
             qs += "phone=" + phone;
         }
@@ -75,10 +75,13 @@ function SearchDAO(client) {
         console.log(tables + " WHERE " + q);
 
         client.query(tables + " WHERE " + q, [], function(err, result) {
-            if(err) cb(err, null, null);
-            if(!result) cb(err, null, null);
-
-            cb(null, qs, result["rows"]);
+            if(err) {
+                cb(err, null, null)
+            } else if(!result) {
+                cb(err, null, null);
+            } else {
+                cb(null, qs, result["rows"]);
+            }
         });
     }
 

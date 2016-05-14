@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) <year> <copyright holder>
  * All rights reserved.
  *
@@ -18,8 +18,6 @@ function SearchHandler(client) {
     this.displaySearch = function(req, res, next) {
         "use strict";
 
-        if(!req.usr) return res.redirect("/login");
-
         searchdao.getAreas(function(err, areas) {
             return res.render("index", {
                 search_type: "text",
@@ -34,8 +32,6 @@ function SearchHandler(client) {
 
     this.handleQuery = function(req, res, next) {
         "use strict";
-
-        if(!req.usr) return res.redirect("/login");
 
         var usr = req.usr;
         var errs  = "";
@@ -112,8 +108,6 @@ function SearchHandler(client) {
     this.displayQuery = function(req, res, next) {
         "use strict";
 
-        if(!req.usr) return res.redirect("/login");
-
         var text = req.query["text"];
         var phone = req.query["phone"];
         var email = req.query["email"];
@@ -157,7 +151,6 @@ function SearchHandler(client) {
 
     this.parseShow = function(req, res, next) {
         "use strict";
-        if(!req.usr) return res.redirect("/login");
         if(req.query && req.query["id"]) {
             searchdao.getBackpagePost(req.query["id"], function(err, doc) {
                 if(err) return next(err);
@@ -175,7 +168,6 @@ function SearchHandler(client) {
 
     this.displayShow = function(req, res, next) {
         "use strict";
-        if(!req.usr) return res.redirect("/login");
         if(req.doc && req.doc["content"]) {
             req.doc["content"] = cheerio.load(req.doc["content"])("div.mainBody").html();
             return res.render("show", req.doc);
@@ -186,7 +178,6 @@ function SearchHandler(client) {
 
     this.handleShow = function(req, res, next) {
         "use strict";
-        if(!req.usr) return res.redirect("/login");
 
         var id = req.body.id;
         searchdao.getBackpagePost(id, function(err, doc) {
