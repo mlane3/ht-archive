@@ -23,7 +23,7 @@ module.exports = exports = function(app, client) {
     var searchHandler = new SearchHandler(client);
     var discoverHandler = new DiscoverHandler(client);
 
-    app.use(seshHandler.isLoggedInMiddleware);
+    // app.use(seshHandler.isLoggedInMiddleware);
 
     // app.get("/login", seshHandler.displayLogin);
     // app.post("/login", jsonParser, urlencodedParser, seshHandler.handleLogin);
