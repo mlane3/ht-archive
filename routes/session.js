@@ -22,8 +22,9 @@ function SeshHandler(client) {
             if(!err && usr) {
                 req.usr = usr["username"];
                 req.usrid = usr["userid"];
+                return next();
             }
-            return next();
+            return res.render("/login");
         });
     }
 
