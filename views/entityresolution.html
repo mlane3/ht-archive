@@ -1,0 +1,68 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+<script
+  src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap.min.js"></script>
+<script
+  src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css">
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/angular-datatables/0.5.4/angular-datatables.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/angular-datatables/0.5.4/css/angular-datatables.min.css">
+<script src="/js/entityresolution.js"></script>
+{% endblock %}
+
+{% block title %}
+HT Freeform Search Results
+{% endblock %}
+
+{% block content %}
+<div ng-app="erApp">
+  <div ng-controller="erController as vm">
+    <form>
+      <div class="form-group">
+        <label for="phones">Phone numbers</label>
+        <div class="btn-group" role="group">
+          <button class="btn btn-danger" type="button"
+            ng-click="vm.removePhone()">-</button>
+          <button class="btn btn-success" type="button"
+            ng-click="vm.addPhone()">+</button>
+        </div>
+        <div ng-repeat="phone in vm.phones">
+          <input class="form-control" type="phone" placeholder="Phone"
+              ng-model="phone.number">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="emails">Emails</label>
+        <div class="btn-group" role="group">
+          <button class="btn btn-danger" type="button"
+            ng-click="vm.removeEmail()">-</button>
+          <button class="btn btn-success" type="button"
+            ng-click="vm.addEmail()">+</button>
+        </div>
+        <div ng-repeat="email in vm.emails">
+          <input class="form-control" type="email" placeholder="Email"
+              ng-model="email.address">
+        </div>
+      </div>
+      <button class="btn btn-success" type="submit"
+        ng-click="vm.resolveEntities()">Resolve Entities</button>
+    </form>
+
+    <h3>Resolved Entities</h3>
+    <table class="row-border hover" datatable="" dt-options="vm.dtOptions"
+        dt-columns="vm.dtColumns" dt-instance="vm.dtInstance"
+        dt-column-defs="vm.dtColumnDefs">
+    </table>
+  </div>
+</div>
+{% endblock %}

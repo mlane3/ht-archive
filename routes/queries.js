@@ -52,7 +52,7 @@ function QueryHandler(client) {
         });
     }
 
-    var search_q = "SELECT backpageentities.entity_id::integer FROM backpageentities";
+    var search_q = "SELECT backpageentities.entity_id::integer AS id, ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpagephone.number), ', ') as phone, ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpageemail.name), ', ') as email, COUNT(DISTINCT backpageentities.backpagepostid) postCount FROM backpageentities";
     search_q += " LEFT JOIN backpageemail ON backpageentities.backpagepostid::integer = backpageemail.backpagepostid";
     search_q += " LEFT JOIN backpagephone ON backpageentities.backpagepostid::integer = backpagephone.backpagepostid";
     search_q += " WHERE ";
@@ -71,8 +71,12 @@ function QueryHandler(client) {
         } else if(req.query["phone"]) {
             phones.push(req.query["phone"]);
         }
-        q += 'backpageemail.name = ANY(\'{"' + emails.join('","') + '"}\'::text[]) OR backpagephone.number = ANY(\'{"' + phones.join('","') + '"}\'::text[]);'
+        console.log(phones);
+        console.log("match: " + (phones[0] == '678-680-9278'));
+        q += 'backpageemail.name = ANY(\'{"' + emails.join('","') + '"}\'::text[]) OR backpagephone.number = ANY(\'{"' + phones.join('","') + '"}\'::text[])'
+        q += " GROUP BY backpageentities.entity_id;"
         client.query(q, function(err, result) {
+            console.log(q);
             if(err) {
                 console.error("error running query", err);
                 return res.status(500).json({
@@ -81,8 +85,9 @@ function QueryHandler(client) {
             }
 
             var data = { "entities": [] };
+            console.log(result.rows);
             result.rows.map(function(row) {
-                data["entities"].push(row["entity_id"]);
+                data["entities"].push(row);
             });
 
             return res.status(200).json(data);

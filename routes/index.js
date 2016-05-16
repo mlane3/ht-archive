@@ -12,7 +12,8 @@ var bodyParser      = require("body-parser")
   , errorHandler    = require("./error").errorHandler
   , SeshHandler     = require("./session")
   , SearchHandler   = require("./search")
-  , QueryHandler    = require("./queries");
+  , QueryHandler    = require("./queries")
+  , EntityResolutionHandler = require("./entityresolution");
 
 module.exports = exports = function(app, client) {
     var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -22,6 +23,7 @@ module.exports = exports = function(app, client) {
     var seshHandler   = new SeshHandler(client);
     var searchHandler = new SearchHandler(client);
     var queryHandler = new QueryHandler(client);
+    var entityResolutionHandler = new EntityResolutionHandler(client);
 
     // app.use(seshHandler.isLoggedInMiddleware);
 
@@ -47,4 +49,7 @@ module.exports = exports = function(app, client) {
     app.post("/show", urlencodedParser, searchHandler.handleShow, searchHandler.displayShow);
 
     app.get("/", urlencodedParser, searchHandler.displaySearch);
+    app.get("/entityresolution",
+        urlencodedParser,
+        entityResolutionHandler.get);
 }
