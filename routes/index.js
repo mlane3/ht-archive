@@ -32,7 +32,8 @@ module.exports = exports = function(app, client) {
 
     // api
     app.get("/api/backpage/entities", queryHandler.getAllEntities);
-    app.get("/api/backpage/entities/:id", queryHandler.getEntityById);
+    app.get("/api/backpage/entities/get/:id", queryHandler.getEntityById);
+    app.get("/api/backpage/entities/resolve", queryHandler.searchEntities);
 
     app.get("/welcome", seshHandler.displayWelcome);
 
