@@ -39,7 +39,7 @@ while(i < new_len) {
 
 runServer = function(err, pwd) {
     var usr = user_input["usr"];
-    var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=true";
+    var url = "postgres://" + usr + ":" + pwd + "@" + user_input["host"] + "/" + user_input["db"] + "?ssl=false";
     pg.connect(url, function(err, client, done) {
         "use strict";
 
