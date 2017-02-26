@@ -1,11 +1,11 @@
-# Frontend node service for data collected from [palantiri](https://gitlab.com/danlrobertson/palantiri)
+# Frontend node service for data collected from [palantiri](https://github.com/anidata/palantiri.git)
 
 ## Getting Started
 
 ### Install
 
 ```
-    $ git clone https://gitlab.com/drobertson/ht-archive.git
+    $ git clone https://github.com/anidata/ht-archive.git
     $ cd ht-archive
     $ npm install
 ```
