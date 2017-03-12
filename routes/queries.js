@@ -54,9 +54,9 @@ function QueryHandler(client) {
     }
     
     var detail_q = "SELECT backpageentities.entity_id::integer AS id, ";
-    detail_q += "ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpagephone.number), ', ') as phone, ";
-    detail_q += "ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpageemail.name), ', ') as email, ";
-    detail_q += "COUNT(DISTINCT backpageemail.backpagepostid) postCount ";
+    detail_q += "ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpagephone.number), ', ') phone, ";
+    detail_q += "ARRAY_TO_STRING(ARRAY_AGG(DISTINCT backpageemail.name), ', ') email, ";
+    detail_q += "COUNT(DISTINCT backpageentities.backpagepostid) postCount ";
     detail_q += "FROM backpageentities ";
     detail_q += "LEFT JOIN backpageemail ON backpageentities.backpagepostid::integer = backpageemail.backpagepostid::integer ";
     detail_q += "LEFT JOIN backpagephone ON backpageentities.backpagepostid::integer = backpagephone.backpagepostid::integer ";
@@ -81,7 +81,10 @@ function QueryHandler(client) {
         } else if(req.query["phone"]) {
             phones.push(req.query["phone"]);
         }
+
         q += 'backpageemail.name = ANY(\'{"' + emails.join('","') + '"}\'::text[]) OR backpagephone.number = ANY(\'{"' + phones.join('","') + '"}\'::text[])'
+
+        console.log(q);
 
         client.query(q, function(err, result) {
             if(err) {
@@ -91,14 +94,19 @@ function QueryHandler(client) {
                 });
             }
 
-            var data = { "entities": [] };
+            var data = {entities: []};
 
-            result.rows.map(function(row) {
-              var tmp = detail_q;
-              tmp += "WHERE backpageentities.entity_id = " + row.id;
-              tmp += "GROUP BY backpageentities.entity_id;"
+            var ids = result.rows.map(function(row) {
+              return row.id;
+            });
 
-              client.query(tmp, function(err, details) {
+            if (ids.length !== 0) {
+              detail_q += "WHERE backpageentities.entity_id = ";
+              detail_q += 'ANY(\'{"' + ids.join('","') + '"}\') ';
+              detail_q += "GROUP BY backpageentities.entity_id;"
+
+              client.query(detail_q, function(err, details) {
+
                 if(err) {
                     console.error("error running query", err);
                     return res.status(500).json({
@@ -106,12 +114,16 @@ function QueryHandler(client) {
                     });
                 }
 
-                data["entities"].push(details);
+                data['entities'] = details.rows;
 
                 return res.status(200).json(data);
-              });
-            });
 
+              });
+            }
+            else {
+              // Return an empty list
+              return res.status(200).json(data);
+            };
         });
     }
 }
