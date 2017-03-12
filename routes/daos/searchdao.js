@@ -39,7 +39,6 @@ function SearchDAO(client) {
             //text = text.replace(/\| and \|/g, "&");
             q += "backpagecontent.textsearch @@ to_tsquery('" + text + "')"
             qs += "text=" + text;
-            debugger;
         }
         if(phone) {
             if(qs != "") {
