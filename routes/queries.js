@@ -84,8 +84,6 @@ function QueryHandler(client) {
 
         q += 'backpageemail.name = ANY(\'{"' + emails.join('","') + '"}\'::text[]) OR backpagephone.number = ANY(\'{"' + phones.join('","') + '"}\'::text[])'
 
-        console.log(q);
-
         client.query(q, function(err, result) {
             if(err) {
                 console.error("error running query", err);
