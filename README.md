@@ -9,6 +9,9 @@
     $ cd ht-archive
     $ npm install
 ```
+### Database
+
+[Use Docker or command line](https://github.com/anidata/ht-archive/wiki) if you already PostgreSQL server running.
 
 ### Running
 
