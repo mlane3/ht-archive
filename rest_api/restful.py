@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from healthcheck import HealthCheck, EnvironmentDump
+from models import *
 
 
 app = Flask(__name__)
@@ -28,18 +29,7 @@ def health_database_status():
     return is_database_working, output
 
 
-class Post(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    backpagepostid = db.Column('backpagepostid', db.Integer, unique=True)
-    title = db.Column('title', db.String(120))
-    body = db.Column('body', db.Unicode)
-    textsearch = db.Column('textsearch', db.String(80))
-    
-
-
 health_database_status()
-bp_data = Post()
-p = bp_data.query.all()
 
 
 @app.route('/', methods=['GET'])
@@ -47,33 +37,67 @@ def test():
 	return jsonify({'message': 'It works!'})
 
 
-# @app.route('/api/backpage/posts', methods=['GET'])
-# def get_posts():
-# 	posts = bp_data.query.all()
-# 	return jsonify({'Posts': [posts]})
+@app.route('/api/backpage/content/<int:backpage_content_id>', methods=['GET'])
+def get_content(backpage_content_id):
+    contents = (Backpagecontent.query.filter_by(id=backpage_content_id).all())
 
-# @app.route('/api/backpage/entities', methods=['GET'])
-# def test1():
-# 	entities = User.query.filter_by(username='entity').all()
-# 	return jsonify({'Entities': [entities]})
-
-
-# @app.route('/api/backpage/entities/get/<string:entity_id>', methods=['GET'])
-# def test2():
-# 	entity = User.query.filter_by(id=entity_id).all()
-# 	return jsonify({'Entities': [entity]})
+    return jsonify({'data': [
+        dict(id=c.id, postId=c.backpagepostid, title=c.title)
+        for c in contents
+    ]})
 
 
-# @app.route('/api/backpage/entities/get/<string:email>', methods=['GET'])
-# def test3():
-# 	entity = User.query.filter(User.email.endswith(email)).all()
-# 	return jsonify({'Entity': entity})
+@app.route('/api/backpage/cities/', methods=['GET'])
+def get_all_cities():
+    cities = (Backpagesite.query.all())
+    # In case we want only names without id's 
+    citynames = [c.name for c in cities]
+
+    return jsonify({'data': [
+        dict(id=c.id, city=c.name)
+        for c in cities
+    ]})
 
 
-# @app.route('/api/backpage/cities/get/<string:city>', methods=['GET'])
-# def test():
-# 	entity = User.query.filter(User.query.filter_by(username=city).all()
-# 	return jsonify({'Entity': entity})
+@app.route('/api/backpage/phone/', methods=['GET'])
+def get_all_numbers():
+    numbers = (Backpagephone.query.all())
+
+    return jsonify({'data': [
+        dict(backpagepostid=n.backpagepostid, number=n.number)
+        for n in numbers
+    ]})
+
+
+@app.route('/api/backpage/phone/<int:backpagepost_id>', methods=['GET'])
+def get_number(backpagepost_id):
+    numbers = (Backpagephone.query.filter_by(backpagepostid=backpagepost_id).all())
+
+    return jsonify({'numbers': [n.number for n in numbers]})
+
+
+@app.route('/api/backpage/phone/<string:number>', methods=['GET'])
+def getid_from_number(number):
+    ids = (Backpagephone.query.filter_by(number=number).all())
+
+    return jsonify({'backpagepost_ids': [i.backpagepostid for i in ids]})
+
+
+@app.route('/api/backpage/email/<int:backpagepost_id>', methods=['GET'])
+def get_email(backpagepost_id):
+    emails = (Backpageemail.query.filter_by(backpagepostid=backpagepost_id).all())
+
+    return jsonify({'Emails': [i.email for i in emails]})
+
+
+@app.route('/api/backpage/email/<string:email>', methods=['GET'])
+def getid_from_mail(email):
+    ids = (Backpageemail.query.filter_by(email=email).all())
+
+    return jsonify({'backpagepost_ids': [i.backpagepostid for i in ids]})
+
+
+
 
 
 if __name__ == "__main__":
