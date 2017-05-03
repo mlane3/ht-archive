@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 from healthcheck import HealthCheck, EnvironmentDump
 from models import *
+import requests 
+import json
+import re
 
 
 app = Flask(__name__)
@@ -9,6 +12,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://localhost:5432/crawler"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+
+"""
+Join below tables:
+Backpagephone, Backpageemail and backpagesite 
+"""
 
 
 # wrap the flask app and give a heathcheck url
@@ -25,7 +34,7 @@ def health_database_status():
         output = str(e)
         is_database_working = False
 
-    print output
+    print (output)
     return is_database_working, output
 
 
@@ -42,8 +51,18 @@ def get_content(backpage_content_id):
     contents = (Backpagecontent.query.filter_by(id=backpage_content_id).all())
 
     return jsonify({'data': [
-        dict(id=c.id, postId=c.backpagepostid, title=c.title)
+        dict(id=c.id, postId=c.backpagepostid, title=c.title, number=phonenumber.number)
         for c in contents
+    ]})
+
+
+@app.route('/api/backpage/content/q=<search>', methods=['GET'])
+def get_search_results(search):
+    contents = (Backpagecontent.query.filter(Backpagecontent.title.contains(search)).all())
+
+    return jsonify({'data': [
+        dict(id=c.id, postId=c.backpagepostid, title=c.title)
+        for c in contents if re.search(r'\b' + search + r'\b', c.title) 
     ]})
 
 
@@ -56,6 +75,17 @@ def get_all_cities():
     return jsonify({'data': [
         dict(id=c.id, city=c.name)
         for c in cities
+    ]})
+
+
+@app.route('/api/backpage/cities/q=<testsearch>', methods=['GET'])
+def search(testsearch):
+    cities = (Backpagesite.query.all())
+    citynames = [c.name for c in cities]
+
+    return jsonify({'data': [
+        dict(id=c.id, city=c.name)
+        for c in cities if testsearch in c.name
     ]})
 
 
