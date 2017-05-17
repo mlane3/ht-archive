@@ -120,7 +120,7 @@ a. Remove the docker container `postgres`:
 ```
 $ docker rm postgres
 ```
-b. Ensure that the `/SOME_FOLDER` is empty. Re-run the setup from the PostgreSQL `$ sudo docker run ...` from earlier. Be sure to complete all `docker exec` steps completely before exiting the `postgres` docker container.
+b. Ensure that the `/SOME_FOLDER` is empty. Re-start from the 'Build/run the PostgreSQL server' step. Be sure to complete all `docker exec` steps completely before exiting the `postgres` docker container.
 
 ## Alternate Method - Local PostgreSQL
 Installation
