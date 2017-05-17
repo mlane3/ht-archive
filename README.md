@@ -25,7 +25,7 @@ Two docker containers are used: 1) a PostgreSQL server and 2) the web applicatio
 
 1. If you haven't already installed Docker, follow the directions on the Docker website: https://www.docker.com/products/overview.  Using macports or brew is not suggested.
 
-1. Download the (~300 MB) PostgreSQL backup from one of the following places (destination is referred to as `/THE_FOLDER_WITH_DOWNLOADED_FILE`):
+1. Download the (~400 MB compressed, ~6.5 GB extracted) PostgreSQL backup from one of the following places (destination is referred to as `/THE_FOLDER_WITH_DOWNLOADED_FILE`):
     * https://drive.google.com/open?id=0B0yTlb-C_V2ZN0tNUFIzNGh1T00
     * https://s3.amazonaws.com/anidata-ht/crawler_er.tar.gz
 
