@@ -14,13 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-"""
-Join below tables:
-Backpagephone, Backpageemail and backpagesite 
-"""
-
-
-# wrap the flask app and give a heathcheck url
+# wrap the flask app and give a heathcheck url to make sure DB is ok
 health = HealthCheck(app, "/healthcheck")
 
 def health_database_status():
@@ -46,6 +40,7 @@ def test():
 	return jsonify({'message': 'It works!'})
 
 
+# Backpagecontent table API endpoints with integer params and text search - returns title, body, postid
 @app.route('/api/backpage/content/<int:backpage_content_id>', methods=['GET'])
 def get_content(backpage_content_id):
     contents = (Backpagecontent.query.filter_by(id=backpage_content_id).all())
@@ -66,6 +61,7 @@ def get_search_results(search):
     ]})
 
 
+# Backpagesite table endpoints - returns all cities in table
 @app.route('/api/backpage/cities/', methods=['GET'])
 def get_all_cities():
     cities = (Backpagesite.query.all())
@@ -89,6 +85,7 @@ def search(testsearch):
     ]})
 
 
+# Backpagephone table endpoints - returns phone numbers and postids 
 @app.route('/api/backpage/phone/', methods=['GET'])
 def get_all_numbers():
     numbers = (Backpagephone.query.all())
@@ -113,6 +110,7 @@ def getid_from_number(number):
     return jsonify({'backpagepost_ids': [i.backpagepostid for i in ids]})
 
 
+# Backpageemail endpoints - returrns emails and post ids
 @app.route('/api/backpage/email/<int:backpagepost_id>', methods=['GET'])
 def get_email(backpagepost_id):
     emails = (Backpageemail.query.filter_by(backpagepostid=backpagepost_id).all())
@@ -127,6 +125,13 @@ def getid_from_mail(email):
     return jsonify({'backpagepost_ids': [i.backpagepostid for i in ids]})
 
 
+# Backpagepost, Backpagephone and Backpagecontent tables joined at this endpoint
+@app.route('/api/backpage/<int:backpagepost_id>/title', methods=['GET'])
+def get_title_withID(backpagepost_id):
+    numbers = (Backpagephone.query.filter_by(backpagepostid=backpagepost_id).all())
+
+    # import pdb; pdb.set_trace()
+    return jsonify({'numbers': [content.title for n in numbers for content in n.backpagepost.content.all()]})
 
 
 
