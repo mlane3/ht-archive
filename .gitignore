@@ -26,3 +26,8 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+#rest_api folder cache and DS_Store
+rest_api/__pycache__
+rest_api/.DS_Store
+rest_api/templates/.DS_Store
